@@ -6,7 +6,10 @@
 .nav-link {
   color:white !important;
 }
-
+.buttom-custom {
+  /* color: #FFFFFF; */
+  background-color: #3949ab;
+}
 .btn-secondary:hover {
     text-decoration: none;
     color: black !important;

@@ -38,7 +38,9 @@ namespace Zwaj.api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
-            var userFromrepo = await _repo.Login(userForLoginDto.username.ToLower(), userForLoginDto.password);
+           
+                // throw new Exception ("exaption");
+                 var userFromrepo = await _repo.Login(userForLoginDto.username.ToLower(), userForLoginDto.password);
             if (userFromrepo == null) return Unauthorized();
             var claims = new[]{
                 new Claim(ClaimTypes.NameIdentifier,userFromrepo.Id.ToString()),
@@ -58,7 +60,7 @@ namespace Zwaj.api.Controllers
             return Ok(new{
                 token = tokenHandler.WriteToken(token)
             });
-
+            
     }
 
 }

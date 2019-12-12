@@ -7,6 +7,7 @@ namespace Zwaj.api.Dtos
         [Required]
         public string Username { get; set; }
         [StringLength(8,MinimumLength=4,ErrorMessage="This Password Is Small and weak")]
+        [Required]
         public string Password { get; set; }
     }
 }

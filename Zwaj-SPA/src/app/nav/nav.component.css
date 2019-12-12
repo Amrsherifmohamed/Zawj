@@ -6,7 +6,12 @@
 .nav-link {
   color:white !important;
 }
+.navbar-custom {
+  /* color: #FFFFFF; */
+  background-color: #880e4f
 
+  ;
+}
 .btn-secondary:hover {
     text-decoration: none;
     color: rgb(0, 0, 0) !important;
