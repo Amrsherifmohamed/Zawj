@@ -5,6 +5,10 @@
 
 @import "~bootstrap-v4-rtl/dist/css/bootstrap-rtl.css";
 @import "~font-awesome/css/font-awesome.min.css";
+@import "~alertifyjs/build/css/alertify.min.css"  ;
+@import "~bootswatch/dist/Sketchy/bootstrap.min.css";
+@import "~alertifyjs/build/css/themes/bootstrap.min.css";
+@import "/assets/styles.css";
 /* @import url(http://fonts.googleleapis.com/earlyaccess/droidarabickufi.css); */
 @font-face { font-family:  "JF-flat"; src: url("/assets/font/JF-Flat-Regular.ttf");}
 @font-face { font-family:  "Droid-Arabic-Kufi-1"; src: url("/assets/font/Droid-Arabic-Kufi-1.ttf");}

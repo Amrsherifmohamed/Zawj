@@ -8,7 +8,7 @@
 }
 .navbar-custom {
   /* color: #FFFFFF; */
-  background-color: #880e4f
+  background-color: #534e51
 
   ;
 }
@@ -16,5 +16,22 @@
     text-decoration: none;
     color: rgb(0, 0, 0) !important;
     background:pink !important
-      }
-
+}
+.dropdown-toggle{
+  cursor: pointer;
+}
+.login_mar{
+  margin-right: 650px;
+}
+.mnav-link:hover,.nav-link:focus{
+  text-decoration:none;
+  color:pink !important;
+}
+.mnav-link{
+  color:black !important;
+  letter-spacing:0.5px;
+  font-weight:bold;
+  font-family:'JF Flat';
+  font-size:1.0rem
+}
+ 

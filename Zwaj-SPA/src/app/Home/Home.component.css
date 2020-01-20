@@ -7,10 +7,10 @@
   color:white !important;
 }
 .buttom-custom {
-  /* color: #FFFFFF; */
-  background-color: #880e4f  ;
+   /* color: #534e51;  */
+  background-color: #534e51  ;
 }
-.btn-secondary:hover {
+.btn-primary:hover {
     text-decoration: none;
     color: black !important;
     background:pink !important
