@@ -12,9 +12,12 @@ import { HomeComponent } from './Home/Home.component';
 import { RegisterComponent } from './register/register.component';
 import { ErrorInterceptorProvider } from './_services/error.interceptor';
 import { AlertifyService } from './_services/alertify.service';
-import { Member_listComponent } from './member_list/member_list.component';
 import { ListsComponent } from './lists/lists.component';
 import { MassegasComponent } from './messages/massegas.component';
+import { RouterModule } from '@angular/router';
+import { appRoutes } from './routes';
+import { MemberListComponent } from './member-list/member-list.component';
+import { AuthGuard } from './_guards/auth.guard';
 
 @NgModule({
    declarations: [
@@ -22,20 +25,22 @@ import { MassegasComponent } from './messages/massegas.component';
       NavComponent,
       HomeComponent,
       RegisterComponent,
-      Member_listComponent,
       ListsComponent,
-      MassegasComponent
+      MassegasComponent,
+      MemberListComponent
    ],
    imports: [
       BrowserModule,
       HttpClientModule,
       FormsModule,
-      BsDropdownModule.forRoot()
+      BsDropdownModule.forRoot(),
+      RouterModule.forRoot(appRoutes)
    ],
    providers: [
       AuthService,
       ErrorInterceptorProvider,
-      AlertifyService
+      AlertifyService,
+      AuthGuard
    ],
    bootstrap: [
       AppComponent

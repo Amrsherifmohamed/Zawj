@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Zwaj.api.Data;
 using Zwaj.api.Dtos;
@@ -12,6 +13,7 @@ using Zwaj.api.Models;
 
 namespace Zwaj.api.Controllers
 {
+    [AllowAnonymous] // any one can inter in this controller
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase

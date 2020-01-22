@@ -19,6 +19,7 @@ using System.Text;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Zwaj.api.helper;
+using AutoMapper;
 
 namespace ZwajApp.api
 {
@@ -35,9 +36,15 @@ namespace ZwajApp.api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<Datacontext>(x=>x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(option=>{
+                option.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                //for preiform json optject in data come
+            });
             services.AddCors();
+            services.AddAutoMapper();
+            services.AddTransient<TrialData>();
             services.AddScoped<IAuthRepository,AuthRepositry>();
+            services.AddScoped<IZwajRepositry,ZwajRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(Options=>{
                 Options.TokenValidationParameters=new TokenValidationParameters{
@@ -52,7 +59,7 @@ namespace ZwajApp.api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,TrialData trialData)
         {
             if (env.IsDevelopment())
             {
@@ -77,6 +84,7 @@ namespace ZwajApp.api
             }
 
             // app.UseHttpsRedirection();
+            // trialData.TrialUsers();=>use this to generate data in triale date in database
             app.UseCors(x=>x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseMvc();

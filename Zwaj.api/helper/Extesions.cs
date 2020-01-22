@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace Zwaj.api.helper
 {
@@ -9,6 +10,11 @@ namespace Zwaj.api.helper
         response.Headers.Add("Access-Control-expose-Headers","Application-Error");
         response.Headers.Add("Access-Control-Allow-Origin","*");
 
+        }
+        public static int calculateage(this DateTime datetime){
+            var age =DateTime.Today.Year-datetime.Year;
+            if(datetime.AddYears(age)>DateTime.Today) age--;
+            return age;
         }
 
     }
