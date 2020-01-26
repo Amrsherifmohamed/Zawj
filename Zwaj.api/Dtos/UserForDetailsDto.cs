@@ -7,8 +7,7 @@ namespace Zwaj.api.Dtos
     public class UserForDetailsDto
     {
          public int Id { get; set; }    
-        public string Username { get; set; }
-       
+        public string Username { get; set; }  
         public string  Gender { get; set; }
         public int  age { get; set; }
         public string KnownAs { get; set; }
