@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Zwaj.api.Models;
+using Zwaj.api.Dtos;
 
 namespace Zwaj.api.Data
 {
@@ -11,8 +12,6 @@ namespace Zwaj.api.Data
          void Delete <T>(T entity) where T:class;
          Task<bool> SaveAll();
          Task<IEnumerable<User>> GetUsers();
-         Task<User> GetUser(int id); 
-
-          
+         Task<User> GetUser(int id);           
     }
 }

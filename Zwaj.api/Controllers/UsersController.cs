@@ -41,6 +41,18 @@ namespace Zwaj.api.Controllers
             var usertodistnation= _mapper.Map<UserForDetailsDto>(userfromsorce);
             return Ok(usertodistnation);
         }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id,UserForUpdateDto userForUpdateDto){
+            if(id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            return Unauthorized();
+            var userFromRepo=await _repo.GetUser(id);
+            _mapper.Map(userForUpdateDto,userFromRepo);
+            if(await _repo.SaveAll()){
+                return NoContent();
+            }
+            throw new Exception($"حدثت مشكله فى تعديل بيانات المشترك رقم {id}");
+
+        }
 
     }
 }

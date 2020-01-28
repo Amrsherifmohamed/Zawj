@@ -15,6 +15,7 @@ namespace Zwaj.api.helper
             .ForMember(dest=>dest.photourl,opt=>{opt.MapFrom(src=>src.Photos.FirstOrDefault(p=>p.Ismain).Url);})
             .ForMember(dest=>dest.age,opt=>{opt.ResolveUsing(src=>src.DateofBirth.calculateage());});
             CreateMap<Photo,PhotoForDetailsDto>();
+            CreateMap<UserForUpdateDto,User>();
         }
     }
 }  

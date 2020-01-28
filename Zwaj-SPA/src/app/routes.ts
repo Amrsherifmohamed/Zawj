@@ -8,9 +8,17 @@ import { MemberDetailComponent } from './member/member-detail/member-detail.comp
 import { AuthGuard } from './_guards/auth.guard';
 import { MemeberDetailResolver } from './_resorvers/member-detail.resolver';
 import { MemeberListResolver } from './_resorvers/member-list.resolver';
+import { MemberEditComponent } from './member/member-edit/member-edit.component';
+import { MemeberEditResolver } from './_resorvers/member-edit.resolver';
+import { PreventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
 export const appRoutes:Routes=[
 {path:'',component:HomeComponent},
 {path:'lists',component:ListsComponent,canActivate:[AuthGuard]},
+{path:'members/edit',component:MemberEditComponent,canActivate:[AuthGuard]
+,canDeactivate:[PreventUnsavedChangesGuard],resolve:{
+    user:MemeberEditResolver
+}},
+
 {path:'member',component:MemberListComponent,canActivate:[AuthGuard],resolve:{
    users:MemeberListResolver
 }},

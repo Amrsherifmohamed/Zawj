@@ -25,7 +25,7 @@ font-family:ToyorAljanah-Regular;font-size:2.25rem;font-weight:bolder" class="na
       {{authservic.decodedToken?.unique_name |titlecase}}
     </a>
     <div  *dropdownMenu class="dropdown-menu ">
-      <a class="dropdown-item mnav-link"><i class="fa fa-user-o" aria-hidden="true"></i>
+      <a class="dropdown-item mnav-link a-ro" [routerLink]="['/members/edit']"  ><i class="fa fa-user-o" aria-hidden="true"></i>
         ملفى الشخصى</a>
       <div class="dropdown-divider "></div>
       <a (click)="logedout()" class="dropdown-item mnav-link"><i class="fa fa-sign-out"></i>

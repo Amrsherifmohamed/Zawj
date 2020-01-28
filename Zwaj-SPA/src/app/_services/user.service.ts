@@ -20,7 +20,10 @@ constructor(private http:HttpClient) { }
 getusers():Observable<User[]>{
   return this.http.get<User[]>(this.basurl/*,httpOptions*/);
 }
-getuser(id):Observable<User>{
+getuser(id:number):Observable<User>{
   return this.http.get<User>(this.basurl+id/*,httpOptions*/);
+}
+updateuser(id:number,user:User){
+  return this.http.put(this.basurl+id,user);
 }
 }
