@@ -21,14 +21,18 @@ export class MemberEditComponent implements OnInit {
     }
   }
 
-user:User
+user:User;
+photoUrl:string;
   constructor(private rout:ActivatedRoute,private alertify:AlertifyService,private userservice:UserService,
     private authservice:AuthService) { }
 
   ngOnInit() {
     this.rout.data.subscribe(data=>{
       this.user=data['user'];
-    })
+    });
+    this.authservice.currentphotoUrl.subscribe(
+     photoUrl=>  this.photoUrl=photoUrl
+    );
   }
   updateuser(){
     this.userservice.updateuser(this.authservice.decodedToken.nameid,this.user).subscribe(

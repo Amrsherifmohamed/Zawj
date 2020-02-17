@@ -35,7 +35,7 @@ namespace Zwaj.api.Controllers
             var usertodistnation = _mapper.Map<IEnumerable<UserForListDto>>(userfromsorce);
             return Ok(usertodistnation);
         }
-        [HttpGet("{id}")]
+        [HttpGet("{id}",Name="GetUser")]
         public async Task<IActionResult> GetUser(int id){
             var userfromsorce =await _repo.GetUser(id);
             var usertodistnation= _mapper.Map<UserForDetailsDto>(userfromsorce);

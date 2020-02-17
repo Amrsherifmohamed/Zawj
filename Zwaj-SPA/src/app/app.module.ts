@@ -2,8 +2,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
-import { FormsModule } from "@angular/forms";
-import {BsDropdownModule, TabsModule} from 'ngx-bootstrap';
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import {BsDropdownModule, TabsModule, BsDatepickerModule} from 'ngx-bootstrap';
 
 // import { ValueComponent } from '.d:/Fcih/Zwaj/Zwaj-SPA/src/value/value.component';
 import { NavComponent } from './nav/nav.component';
@@ -28,6 +28,8 @@ import { NgxGalleryModule } from 'ngx-gallery';
 import { MemberEditComponent } from './member/member-edit/member-edit.component';
 import { MemeberEditResolver } from './_resorvers/member-edit.resolver';
 import { PreventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
+import { PhotoEditorComponent } from './member/photo-editor/photo-editor.component';
+import { FileUploadModule } from 'ng2-file-upload';
 
 
 export function tokenGetter(){
@@ -44,7 +46,8 @@ export function tokenGetter(){
       MemberListComponent,
       MemberCardComponent,
       MemberDetailComponent,
-      MemberEditComponent
+      MemberEditComponent,
+      PhotoEditorComponent
    ],
    imports: [
       BrowserModule,
@@ -60,7 +63,10 @@ export function tokenGetter(){
             whitelistedDomains:['localhost:5000'],
             blacklistedRoutes:['localhost:5000/api/auth']
          }
-      })
+      }),
+      FileUploadModule,
+      ReactiveFormsModule,
+      BsDatepickerModule.forRoot()
    ],
    providers: [
       AuthService,

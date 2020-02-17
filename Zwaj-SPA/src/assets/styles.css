@@ -109,3 +109,6 @@
   .alertify .ajs-footer .ajs-buttons.ajs-primary{
     text-align: left;
   }
+  .bs-datepicker{
+direction: rtl;
+  }

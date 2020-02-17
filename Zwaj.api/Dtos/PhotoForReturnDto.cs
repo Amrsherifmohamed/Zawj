@@ -1,15 +1,14 @@
 using System;
-namespace Zwaj.api.Models
+
+namespace Zwaj.api.Dtos
 {
-    public class Photo
+    public class PhotoForReturnDto
     {
        public int Id { get; set; } 
        public string Url { get; set; }
        public string Description { get; set; }
        public DateTime DateAdded { get; set; }
-       public bool Ismain { get; set; } //main photo
+       public bool Ismain { get; set; }
        public string PublicId { get; set; }
-       public User User { get; set; }
-       public int UserId { get; set; }
     }
 }

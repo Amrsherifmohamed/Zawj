@@ -16,6 +16,9 @@ namespace Zwaj.api.helper
             .ForMember(dest=>dest.age,opt=>{opt.ResolveUsing(src=>src.DateofBirth.calculateage());});
             CreateMap<Photo,PhotoForDetailsDto>();
             CreateMap<UserForUpdateDto,User>();
+            CreateMap<Photo,PhotoForReturnDto>();
+            CreateMap<PhotoForCreateDto,Photo>();
+            CreateMap<UserForRegiterDto,User>();
         }
     }
 }  
