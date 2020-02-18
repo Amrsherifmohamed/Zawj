@@ -11,39 +11,56 @@ import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gal
   styleUrls: ['./member-detail.component.css']
 })
 export class MemberDetailComponent implements OnInit {
-user:User
-galleryOptions:NgxGalleryOptions[];
-galleryImages:NgxGalleryImage[];
-  constructor(private userservice:UserService,private alertify:AlertifyService,
-    private route:ActivatedRoute) { }
+  user: User;
+  created:string;
+  age:string;
+  showIntro:boolean=true;
+  showLook:boolean=true;
+  looks:boolean=true;
+  options = {weekday : 'long' , year :'numeric' , month : 'long',day:'numeric'};
+
+  galleryOptions: NgxGalleryOptions[];
+  galleryImages: NgxGalleryImage[];
+  constructor(private userService: UserService, private alertify: AlertifyService,
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
-    // this.loaduser();
-    this.route.data.subscribe(data=>{
-      this.user=data['user'];
+    // this.loadUser();
+    this.route.data.subscribe(data => {
+      this.user = data['user'];
     });
     this.galleryOptions=[{
       width:'500px',height:'500px',imagePercent:100,thumbnailsColumns:4,
-      imageAnimation:NgxGalleryAnimation.Slide,preview:false  
+      imageAnimation:NgxGalleryAnimation.Slide,preview:false
     }]
-    this.galleryImages=this.getimages();
+
+    this.galleryImages=this.getImages();
+    this.created = new Date(this.user.created).toLocaleString('ar-EG',this.options).replace('،','');
+    this.age = this.user.age.toLocaleString('ar-EG');
+    this.showIntro=true;
+    this.showLook=true;
+    this.looks=true;
+
   }
-  getimages(){
-    const imageUrl=[];
-    for(let i=0;i<this.user.photos.length;i++){
-      imageUrl.push({
+  getImages(){
+    const imageUrls=[];
+    for(let i =0;i<this.user.photos.length;i++){
+      imageUrls.push({
         small:this.user.photos[i].url,
         medium:this.user.photos[i].url,
         big:this.user.photos[i].url,
       })
     };
-    return imageUrl;
+    return imageUrls;
   }
-  // loaduser(){
-  //   this.userservice.getuser(+this.route.snapshot.params['id']).subscribe(
+
+  // loadUser(){
+  //   this.userService.getUser(+this.route.snapshot.params['id']).subscribe(
   //     (user:User)=>{this.user=user},
-  //     error=>{this.alertify.error('error')}
+  //     error=>{this.alertify.error(error)}
   //   )
   // }
+
+
 
 }

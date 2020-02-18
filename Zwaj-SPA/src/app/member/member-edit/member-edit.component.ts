@@ -15,6 +15,10 @@ import { nextTick } from 'q';
 export class MemberEditComponent implements OnInit {
   @ViewChild('editForm') editform:NgForm
   @HostListener('window:beforeunload',['$event'])
+  created:string;
+  age:string;
+  options = {weekday : 'long' , year :'numeric' , month : 'long',day:'numeric'};
+
   unLoadNotification($event:any){
     if(this.editform.dirty){
       $event.returnValue=true;  
@@ -33,6 +37,8 @@ photoUrl:string;
     this.authservice.currentphotoUrl.subscribe(
      photoUrl=>  this.photoUrl=photoUrl
     );
+    this.created = new Date(this.user.created).toLocaleString('ar-EG',this.options).replace('،','');
+    this.age = this.user.age.toLocaleString('ar-EG');
   }
   updateuser(){
     this.userservice.updateuser(this.authservice.decodedToken.nameid,this.user).subscribe(

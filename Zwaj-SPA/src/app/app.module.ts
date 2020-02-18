@@ -30,6 +30,7 @@ import { MemeberEditResolver } from './_resorvers/member-edit.resolver';
 import { PreventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
 import { PhotoEditorComponent } from './member/photo-editor/photo-editor.component';
 import { FileUploadModule } from 'ng2-file-upload';
+import { TimeAgoPipe } from 'time-ago-pipe';
 
 
 export function tokenGetter(){
@@ -47,7 +48,8 @@ export function tokenGetter(){
       MemberCardComponent,
       MemberDetailComponent,
       MemberEditComponent,
-      PhotoEditorComponent
+      PhotoEditorComponent,
+      TimeAgoPipe
    ],
    imports: [
       BrowserModule,

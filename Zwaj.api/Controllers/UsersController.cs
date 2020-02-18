@@ -12,10 +12,12 @@ using Zwaj.api.Data;
 using Zwaj.api.Dtos;
 using Zwaj.api.Models;
 using AutoMapper;
+using Zwaj.api.helper;
 
 namespace Zwaj.api.Controllers
 {
    // [AllowAnonymous] dont need this becouse its have information about client 
+    [ServiceFilter(typeof(LogUserActivity))]
     [Authorize]
     [Route("api/[controller]")]//route for this controller api/Users
     [ApiController]
