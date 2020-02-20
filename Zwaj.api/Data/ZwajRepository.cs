@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Zwaj.api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Zwaj.api.helper;
+using System;
 
 namespace Zwaj.api.Data
 {
@@ -25,9 +27,34 @@ namespace Zwaj.api.Data
        {
            return await _context.SaveChangesAsync()>0;
        }
-        public async  Task<IEnumerable<User>> GetUsers(){
-            var user=await _context.Users.Include(u=>u.Photos).ToListAsync();
-            return user;
+        // public async  Task<PagedList<User>> GetUsers(UserParems userParems){
+        //     var user= _context.Users.Include(u=>u.Photos);
+        //     return await PagedList<User>.
+        //     CreateAsync(user,userParems.PageNumber,userParems.pageSize);
+        // }
+          public async Task<PagedList<User>> GetUsers(UserParams userParams)
+        {
+           var users =  _context.Users.Include(u=>u.Photos)
+           .OrderByDescending(u=>u.lastActive).AsQueryable();
+           users = users.Where(u=>u.Id!=userParams.UserId);
+           users = users.Where(u=>u.Gender==userParams.Gender);
+           if(userParams.MinAge!=18||userParams.MaxAge!=99){
+               var minDob = DateTime.Today.AddYears(-userParams.MaxAge-1);
+               var maxDob = DateTime.Today.AddYears(-userParams.MinAge);
+               users = users.Where(u=>u.DateofBirth>=minDob && u.DateofBirth<=maxDob);
+           }
+           if(!string.IsNullOrEmpty(userParams.OrderBy)){
+               switch (userParams.OrderBy)
+               {
+                   case "created":
+                   users=users.OrderByDescending(u=>u.created);
+                   break;
+                   default:
+                   users= users.OrderByDescending(u=>u.lastActive);
+                   break;
+               }
+           }
+           return await PagedList<User>.CreateAsync(users,userParams.PageNumber,userParams.PageSize);
         }
         public async Task<User> GetUser(int id)
         {
@@ -43,6 +70,7 @@ namespace Zwaj.api.Data
         }
         public async Task<Photo> GetmainPhotoForUser(int id){
             return await _context.Photos.Where(u=>u.UserId==id).FirstOrDefaultAsync(p=>p.Ismain);
-        }   
+        }
+
     }
 }

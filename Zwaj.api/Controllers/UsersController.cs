@@ -32,11 +32,27 @@ namespace Zwaj.api.Controllers
             _mapper=mapper; 
         }
         [HttpGet]
-        public async Task<IActionResult> GetUsers(){
-            var userfromsorce=await _repo.GetUsers();
-            var usertodistnation = _mapper.Map<IEnumerable<UserForListDto>>(userfromsorce);
-            return Ok(usertodistnation);
+        public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var userFromRepo = await _repo.GetUser(currentUserId);
+            userParams.UserId=currentUserId;
+            if(string.IsNullOrEmpty(userParams.Gender)){
+                userParams.Gender=userFromRepo.Gender=="رجل"?"إمرأة":"رجل";
+            }
+            var users = await _repo.GetUsers(userParams);
+            var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
+            Response.AddPagination(users.CurrentPage,users.PageSize,users.TotalCount,users.TotalPages);
+            return Ok(usersToReturn);
         }
+
+        // public async Task<IActionResult> GetUsers([FromQuery]UserParems userParems){
+        //     var userfromsorce=await _repo.GetUsers(userParems);
+        //     var usertodistnation = _mapper.Map<IEnumerable<UserForListDto>>(userfromsorce);
+        //     Response.AddPagination(userfromsorce.CurrentPage,userfromsorce.PageSize,userfromsorce.TotalCount,
+        //     userfromsorce.TotalPage);
+        //     return Ok(usertodistnation);
+        // }
         [HttpGet("{id}",Name="GetUser")]
         public async Task<IActionResult> GetUser(int id){
             var userfromsorce =await _repo.GetUser(id);

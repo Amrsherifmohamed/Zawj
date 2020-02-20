@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import {BsDropdownModule, TabsModule, BsDatepickerModule} from 'ngx-bootstrap';
+import {BsDropdownModule, TabsModule, BsDatepickerModule, PaginationModule, ButtonsModule} from 'ngx-bootstrap';
 
 // import { ValueComponent } from '.d:/Fcih/Zwaj/Zwaj-SPA/src/value/value.component';
 import { NavComponent } from './nav/nav.component';
@@ -68,7 +68,9 @@ export function tokenGetter(){
       }),
       FileUploadModule,
       ReactiveFormsModule,
-      BsDatepickerModule.forRoot()
+      BsDatepickerModule.forRoot(),
+      PaginationModule.forRoot(),
+      ButtonsModule.forRoot()
    ],
    providers: [
       AuthService,
