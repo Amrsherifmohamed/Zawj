@@ -46,13 +46,6 @@ namespace Zwaj.api.Controllers
             return Ok(usersToReturn);
         }
 
-        // public async Task<IActionResult> GetUsers([FromQuery]UserParems userParems){
-        //     var userfromsorce=await _repo.GetUsers(userParems);
-        //     var usertodistnation = _mapper.Map<IEnumerable<UserForListDto>>(userfromsorce);
-        //     Response.AddPagination(userfromsorce.CurrentPage,userfromsorce.PageSize,userfromsorce.TotalCount,
-        //     userfromsorce.TotalPage);
-        //     return Ok(usertodistnation);
-        // }
         [HttpGet("{id}",Name="GetUser")]
         public async Task<IActionResult> GetUser(int id){
             var userfromsorce =await _repo.GetUser(id);
@@ -69,7 +62,26 @@ namespace Zwaj.api.Controllers
                 return NoContent();
             }
             throw new Exception($"حدثت مشكله فى تعديل بيانات المشترك رقم {id}");
-
+        }
+        [HttpPost("{id}/like/{recipientId}")]
+        public async Task<IActionResult> LikeUser(int id ,int recipientId){
+            if(id!= int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            return Unauthorized();
+            var like=await _repo.GetLike(id,recipientId);
+            if(like!=null){
+                return BadRequest("هذه المسخدم موجود فى قائمة الاعجاب من قبل ");
+            }
+            if(await _repo.GetUser(recipientId)==null)
+            return NotFound();
+            like=new Like{
+                LikerId=id,
+                LikeeId=recipientId
+            };
+            _repo.Add<Like>(like);
+           if(await _repo.SaveAll()){
+           return Ok();}else{
+               return BadRequest("حدث خطا ما اثناء الاعجاب");
+           }
         }
 
     }

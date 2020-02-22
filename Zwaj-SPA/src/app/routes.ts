@@ -11,9 +11,9 @@ import { MemeberListResolver } from './_resorvers/member-list.resolver';
 import { MemberEditComponent } from './member/member-edit/member-edit.component';
 import { MemeberEditResolver } from './_resorvers/member-edit.resolver';
 import { PreventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
+import { ListResolver } from './_resorvers/lists.resolver';
 export const appRoutes:Routes=[
 {path:'',component:HomeComponent},
-{path:'lists',component:ListsComponent,canActivate:[AuthGuard]},
 {path:'members/edit',component:MemberEditComponent,canActivate:[AuthGuard]
 ,canDeactivate:[PreventUnsavedChangesGuard],resolve:{
     user:MemeberEditResolver
@@ -24,6 +24,9 @@ export const appRoutes:Routes=[
 }},
 {path:'member/:id',component:MemberDetailComponent,canActivate:[AuthGuard],resolve:{
     user:MemeberDetailResolver
+}},
+{path:'lists',component:ListsComponent,canActivate:[AuthGuard],resolve:{
+    user:ListResolver
 }},
 {path:'Messages',component:MassegasComponent,canActivate:[AuthGuard]},
 {path:'**',redirectTo:'',pathMatch:'full'}
