@@ -13,6 +13,9 @@ using Zwaj.api.Dtos;
 using Zwaj.api.Models;
 using AutoMapper;
 using Zwaj.api.helper;
+using Microsoft.Extensions.Options;
+using Stripe;
+// using Stripe;
 
 namespace Zwaj.api.Controllers
 {
@@ -26,10 +29,12 @@ namespace Zwaj.api.Controllers
 
         private readonly IZwajRepositry _repo;
         private readonly IMapper _mapper;
-        public UsersController(IZwajRepositry repo,IMapper mapper)
+        private readonly IOptions<StripeSettings> _stripSetteings;
+        public UsersController(IZwajRepositry repo,IMapper mapper,IOptions<StripeSettings> stripSetteings)
         {
             _repo=repo;  
             _mapper=mapper; 
+            _stripSetteings=stripSetteings;
         }
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
@@ -83,6 +88,45 @@ namespace Zwaj.api.Controllers
                return BadRequest("حدث خطا ما اثناء الاعجاب");
            }
         }
-
+        [HttpPost("{userId}/charge/{stripeToken}")]
+        public async Task<IActionResult> Charge(int userId, string stripeToken)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+            var customers = new CustomerService();
+            var charges = new ChargeService();
+            var customer = customers.Create(new CustomerCreateOptions {
+            Source=stripeToken
+            });
+            var charge = charges.Create(new ChargeCreateOptions {
+            Amount = 5000,
+            Description = "إشتراك مدى الحياة",
+            Currency = "usd",
+            Customer = customer.Id
+            });
+            var payment = new Payment{
+                PaymentDate = DateTime.Now,
+                Amount = charge.Amount/100,
+                UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
+                ReceiptUrl = charge.ReceiptUrl,
+                Description = charge.Description,
+                Currency = charge.Currency,
+                IsPaid = charge.Paid
+            };
+            _repo.Add<Payment>(payment);
+            if(await _repo.SaveAll()){
+           return Ok(new {IsPaid = charge.Paid } );
+            }
+            return BadRequest("فشل في السداد");
+        }
+        [HttpGet("{userId}/payment")]
+        public async Task<IActionResult> getpayment(int userId){
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+            var paymentId=await _repo.GetPaymentForuser(userId);
+            if(paymentId!=null)
+            return NoContent();
+            return Ok(paymentId);
+        }
     }
 }

@@ -1,35 +1,43 @@
-import {Routes} from '@angular/router'
-import { HomeComponent } from './Home/Home.component'
-import { ListsComponent } from './lists/lists.component'
-import { MassegasComponent } from './messages/massegas.component';
-import { MemberListComponent } from './member/member-list/member-list.component';
-import { MemberDetailComponent } from './member/member-detail/member-detail.component';
-
+import { Routes } from '@angular/router'
+import { HomeComponent } from './home/home.component';
+import { MemberListComponent } from './members/member-list/member-list.component';
+import { ListsComponent } from './lists/lists.component';
+import { MessagesComponent } from './messages/messages.component';
 import { AuthGuard } from './_guards/auth.guard';
-import { MemeberDetailResolver } from './_resorvers/member-detail.resolver';
-import { MemeberListResolver } from './_resorvers/member-list.resolver';
-import { MemberEditComponent } from './member/member-edit/member-edit.component';
-import { MemeberEditResolver } from './_resorvers/member-edit.resolver';
+import { MemberDetailComponent } from './members/member-detail/member-detail.component';
+import { MemberDetailResolver } from './_resolvers/member-detail.resolver';
+import { MemberListResolver } from './_resolvers/member-list.resolver';
+import { MemberEditComponent } from './members/member-edit/member-edit.component';
+import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { PreventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
-import { ListResolver } from './_resorvers/lists.resolver';
-export const appRoutes:Routes=[
-{path:'',component:HomeComponent},
-{path:'members/edit',component:MemberEditComponent,canActivate:[AuthGuard]
-,canDeactivate:[PreventUnsavedChangesGuard],resolve:{
-    user:MemeberEditResolver
-}},
-
-{path:'member',component:MemberListComponent,canActivate:[AuthGuard],resolve:{
-   users:MemeberListResolver
-}},
-{path:'member/:id',component:MemberDetailComponent,canActivate:[AuthGuard],resolve:{
-    user:MemeberDetailResolver
-}},
-{path:'lists',component:ListsComponent,canActivate:[AuthGuard],resolve:{
-    user:ListResolver
-}},
-{path:'Messages',component:MassegasComponent,canActivate:[AuthGuard]},
-{path:'**',redirectTo:'',pathMatch:'full'}
-
-
-]
+import { ListResolver } from './_resolvers/lists.resolver';
+import { MessageResolver } from './_resolvers/message.resolver';
+import { PaymentComponent } from './payment/payment.component';
+import { MessagesGuard } from './_guards/messages.guard';
+import { ChargeGuard } from './_guards/charge.guard';
+export const appRoutes: Routes = [
+    { path: '', component: HomeComponent },
+    {
+        path: '',
+        runGuardsAndResolvers: 'always'
+        , canActivate: [AuthGuard],
+        children: [
+            { path: 'members', component: MemberListComponent,resolve:{
+                users:MemberListResolver
+            } },
+            { path: 'member/edit', component: MemberEditComponent ,resolve:{
+                user:MemberEditResolver},canDeactivate:[PreventUnsavedChangesGuard]},
+            { path: 'members/:id', component: MemberDetailComponent,resolve:{
+                user:MemberDetailResolver
+            } },
+           
+            { path: 'lists', component: ListsComponent ,resolve:{
+                users:ListResolver
+            } },
+            { path: 'messages', component: MessagesComponent,canActivate:[MessagesGuard] , resolve:{messages:MessageResolver} },
+            { path: 'charge', component: PaymentComponent ,canActivate:[ChargeGuard]}
+        ]
+    },
+   
+    { path: '**', redirectTo: '', pathMatch: 'full' }
+];

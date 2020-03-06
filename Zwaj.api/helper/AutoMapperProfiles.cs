@@ -19,6 +19,10 @@ namespace Zwaj.api.helper
             CreateMap<Photo,PhotoForReturnDto>();
             CreateMap<PhotoForCreateDto,Photo>();
             CreateMap<UserForRegiterDto,User>();
+            CreateMap<MessageForCreateDto,Message>().ReverseMap();
+            CreateMap<Message,MessageToReturnDto>()
+            .ForMember(dest=>dest.RecipientPhotoUrl,opt=>{opt.MapFrom(src=>src.Recipient.Photos.FirstOrDefault(p=>p.Ismain).Url);})
+            .ForMember(dest=>dest.SenderPhotoUrl,opt=>{opt.MapFrom(src=>src.Sender.Photos.FirstOrDefault(p=>p.Ismain).Url);});
         }
     }
 }  

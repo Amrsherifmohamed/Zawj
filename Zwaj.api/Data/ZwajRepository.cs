@@ -95,5 +95,59 @@ namespace Zwaj.api.Data
                 return user.Likees.Where(u=>u.LikerId==id).Select(l=>l.LikeeId);
             }
         }
+
+        public async Task<Message> GetMessage(int id)
+        {
+            var messagereturn=await _context.Messages.FirstOrDefaultAsync(m=>m.Id==id);
+            return messagereturn;
+        }
+
+        public async Task<PagedList<Message>> GetMessageForUser(MessageParams messageParams)
+        {
+            var messages= _context.Messages.Include(m=>m.Sender).ThenInclude(u=>u.Photos)
+            .Include(m=>m.Recipient).ThenInclude(u=>u.Photos).AsQueryable();
+            switch (messageParams.MessageType)
+            {
+                case "Inbox":
+                messages=messages.Where(m=>m.RecipientId==messageParams.UserId&&
+                m.RecipientDeleted==false);
+                break;
+                case "Outbox":
+                messages=messages.Where(m=>m.SenderId==messageParams.UserId&&
+                m.SenderDelated==false);
+                break;
+                default:
+                messages=messages.Where(m=>m.RecipientId==messageParams.UserId&&m.IsRead==false
+                &&m.RecipientDeleted==false);
+                break;
+            }
+            messages=messages.OrderByDescending(m=>m.MessageSent);
+            return await PagedList<Message>.CreateAsync(messages,messageParams.PageNumber,messageParams.PageSize);
+                
+        }
+        public async Task<IEnumerable<Message>> GetConversition(int userId, int recipientId)
+        {
+            var messages = await _context.Messages.Include(m=>m.Sender).
+            ThenInclude(u=>u.Photos)
+            .Include(m=>m.Recipient).ThenInclude(u=>u.Photos)
+            .Where(m=>m.RecipientId==userId &&m.RecipientDeleted==false&&
+             m.SenderId==recipientId || m.RecipientId==recipientId &&m.SenderDelated==false&& m.SenderId==userId)
+             .OrderByDescending(m=>m.MessageSent).ToListAsync();
+            return messages;
+           // && m.RecipientDeleted == false
+           // m.SenderDeleted == false &&
+        }
+        public async Task<int> GetUnreadMessagesForUser(int userId)
+        {
+            var messages = await _context.Messages.Where(m => m.IsRead == false && m.RecipientId == userId).ToListAsync();
+            var count = messages.Count();
+            return count;
+
+        }
+
+        public async Task<Payment> GetPaymentForuser(int userId)
+        {
+           return await _context.Payments.FirstOrDefaultAsync(p=>p.UserId==userId);
+        }
     }
 }

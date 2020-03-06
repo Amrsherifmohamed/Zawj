@@ -7,10 +7,10 @@ describe('Service: User', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [UserService]
-    })
+    });
   });
 
   it('should ...', inject([UserService], (service: UserService) => {
     expect(service).toBeTruthy();
-  }))
+  }));
 });

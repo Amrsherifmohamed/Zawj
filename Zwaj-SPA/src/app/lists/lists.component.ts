@@ -21,8 +21,8 @@ search:boolean=false;
   ngOnInit() {
     this.route.data.subscribe(
       data=>{
-        this.users = data['user'].result;
-        this.pagination= data['user'].pagination;
+        this.users = data['users'].result;
+        this.pagination= data['users'].pagination;
       }
     );
     this.likeParam='Likers';
@@ -32,14 +32,14 @@ search:boolean=false;
     if (!this.search) {
       this.pagination.currentPage=1;
        }
-    this.userService.getusers(this.pagination.currentPage, 
-      this.pagination.itemsPerPage,null,this.likeParam)
-      .subscribe((res: PaginationResult<User[]>) => {
+    this.userService.getUsers(this.pagination.currentPage, this.pagination.itemsPerPage,null,this.likeParam).subscribe((res: PaginationResult<User[]>) => {
       this.users = res.result;
-      this.pagination = res.pagination;     
+      this.pagination = res.pagination;
+      
     },
       error => this.alertify.error(error)
     );
+
 }
 pageChanged(event: any): void {
   this.pagination.currentPage = event.page;

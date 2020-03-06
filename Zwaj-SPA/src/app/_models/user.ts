@@ -1,4 +1,5 @@
 import { Photo } from "./photo";
+
 export interface User {
     id:number;
     username:string;
@@ -7,7 +8,7 @@ export interface User {
     gender:string;
     created:Date;
     lastActive:Date;
-    photourl:string;
+    photoURL:string;
     city:string;
     country:string;
     interests?:string;
@@ -15,4 +16,5 @@ export interface User {
     lookingFor?:string;
     photos?:Photo[];
 
+        
 }

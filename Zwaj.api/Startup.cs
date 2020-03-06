@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Zwaj.api.helper;
 using AutoMapper;
+using Zwaj.api.Models;
+using Stripe;
 
 namespace ZwajApp.api
 {
@@ -33,7 +35,9 @@ namespace ZwajApp.api
                 //for preiform json optject in data come
             });
             services.AddCors();
+            services.AddSignalR();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
+            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
             services.AddAutoMapper();
             services.AddTransient<TrialData>();
             services.AddScoped<IAuthRepository,AuthRepositry>();
@@ -55,6 +59,7 @@ namespace ZwajApp.api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,TrialData trialData)
         {
+            StripeConfiguration.SetApiKey(Configuration.GetSection("Stripe:SecretKey").Value);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -78,8 +83,11 @@ namespace ZwajApp.api
             }
 
             // app.UseHttpsRedirection();
-            // trialData.TrialUsers();=>use this to generate data in triale date in database
-            app.UseCors(x=>x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            // trialData.TrialUsers();//=>use this to generate data in triale date in database
+            app.UseCors(x=>x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseSignalR(routes=>{
+                routes.MapHub<ChatHub>("/chat");
+            });
             app.UseAuthentication();
             app.UseMvc();
         }

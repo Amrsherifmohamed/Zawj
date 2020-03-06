@@ -21,5 +21,7 @@ namespace Zwaj.api.Models
         public ICollection<Photo> Photos { get; set; }
        public ICollection<Like> Likers { get; set; }
        public ICollection<Like> Likees { get; set; }
+       public ICollection<Message> MassageSent { get; set; }
+       public ICollection<Message> MassageRecived  { get; set; }
     }
 }

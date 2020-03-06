@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Zwaj-SPA": {
+    "ZwajApp-SPA": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/Zwaj-SPA",
+            "outputPath": "dist/ZwajApp-SPA",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -25,8 +25,7 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": [
-              "node_modules/alertifyjs/build/alertify.min.js"
+            "scripts": ["node_modules/alertifyjs/build/alertify.js"
             ]
           },
           "configurations": {
@@ -52,18 +51,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "Zwaj-SPA:build"
+            "browserTarget": "ZwajApp-SPA:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "Zwaj-SPA:build:production"
+              "browserTarget": "ZwajApp-SPA:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Zwaj-SPA:build"
+            "browserTarget": "ZwajApp-SPA:build"
           }
         },
         "test": {
@@ -97,7 +96,7 @@
         }
       }
     },
-    "Zwaj-SPA-e2e": {
+    "ZwajApp-SPA-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "architect": {
@@ -105,11 +104,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "Zwaj-SPA:serve"
+            "devServerTarget": "ZwajApp-SPA:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "Zwaj-SPA:serve:production"
+              "devServerTarget": "ZwajApp-SPA:serve:production"
             }
           }
         },
@@ -125,5 +124,5 @@
       }
     }
   },
-  "defaultProject": "Zwaj-SPA"
+  "defaultProject": "ZwajApp-SPA"
 }
