@@ -54,10 +54,16 @@ changeMemberPhoto(newPhotoUrl:string){
     catch{
       return false
     }
-      
-    
-
-
+  }
+  rolematch(AllowedRoles:Array<string>):boolean{
+    let isMatch=false;
+    const userRoles=this.decodedToken.role as Array<string>;
+    AllowedRoles.forEach(element=>{
+      if(userRoles.includes(element)){      isMatch=true;
+      return;
+      }
+    });
+    return isMatch;
   }
 
 

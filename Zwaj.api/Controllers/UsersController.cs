@@ -21,7 +21,6 @@ namespace Zwaj.api.Controllers
 {
    // [AllowAnonymous] dont need this becouse its have information about client 
     [ServiceFilter(typeof(LogUserActivity))]
-    [Authorize]
     [Route("api/[controller]")]//route for this controller api/Users
     [ApiController]
     public class UsersController : ControllerBase
@@ -40,7 +39,7 @@ namespace Zwaj.api.Controllers
         public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
         {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var userFromRepo = await _repo.GetUser(currentUserId);
+            var userFromRepo = await _repo.GetUser(currentUserId,true);
             userParams.UserId=currentUserId;
             if(string.IsNullOrEmpty(userParams.Gender)){
                 userParams.Gender=userFromRepo.Gender=="رجل"?"إمرأة":"رجل";
@@ -53,7 +52,8 @@ namespace Zwaj.api.Controllers
 
         [HttpGet("{id}",Name="GetUser")]
         public async Task<IActionResult> GetUser(int id){
-            var userfromsorce =await _repo.GetUser(id);
+          var isCurrentuser= (int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))==id;
+            var userfromsorce =await _repo.GetUser(id,isCurrentuser);
             var usertodistnation= _mapper.Map<UserForDetailsDto>(userfromsorce);
             return Ok(usertodistnation);
         }
@@ -61,7 +61,8 @@ namespace Zwaj.api.Controllers
         public async Task<IActionResult> UpdateUser(int id,UserForUpdateDto userForUpdateDto){
             if(id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
             return Unauthorized();
-            var userFromRepo=await _repo.GetUser(id);
+
+            var userFromRepo=await _repo.GetUser(id,true);
             _mapper.Map(userForUpdateDto,userFromRepo);
             if(await _repo.SaveAll()){
                 return NoContent();
@@ -72,11 +73,12 @@ namespace Zwaj.api.Controllers
         public async Task<IActionResult> LikeUser(int id ,int recipientId){
             if(id!= int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
             return Unauthorized();
+
             var like=await _repo.GetLike(id,recipientId);
             if(like!=null){
                 return BadRequest("هذه المسخدم موجود فى قائمة الاعجاب من قبل ");
             }
-            if(await _repo.GetUser(recipientId)==null)
+            if(await _repo.GetUser(recipientId,false)==null)
             return NotFound();
             like=new Like{
                 LikerId=id,

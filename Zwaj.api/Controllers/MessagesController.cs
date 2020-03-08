@@ -13,7 +13,6 @@ using Zwaj.api.Models;
 namespace Zwaj.api.Controllers
 {
     [ServiceFilter(typeof(LogUserActivity))]
-    [Authorize]
     [Route("api/users/{userId}/[controller]")]//route for this controller api/Users
     [ApiController]
     public class MessagesController :ControllerBase
@@ -50,11 +49,11 @@ namespace Zwaj.api.Controllers
         public async Task<IActionResult> CreateMessage(int userId,MessageForCreateDto 
         messageForCreateDto)
         {
-            var sender= _repo.GetUser(userId);
+            var sender= _repo.GetUser(userId,true);
             if(sender.Id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
             return Unauthorized();
             messageForCreateDto.SenderId=userId;
-            var RecipentFromrepo= await _repo.GetUser(messageForCreateDto.RecipientId);
+            var RecipentFromrepo= await _repo.GetUser(messageForCreateDto.RecipientId,false);
             if(RecipentFromrepo==null)
             return BadRequest("لم يتم الوصول للمرسال اليه");
             var message=_mapper.Map<Message>(messageForCreateDto);

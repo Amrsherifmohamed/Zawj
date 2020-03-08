@@ -14,6 +14,9 @@ using Zwaj.api.helper;
 using AutoMapper;
 using Zwaj.api.Models;
 using Stripe;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace ZwajApp.api
 {
@@ -30,19 +33,16 @@ namespace ZwajApp.api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<Datacontext>(x=>x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(option=>{
-                option.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                //for preiform json optject in data come
+            IdentityBuilder builder=services.AddIdentityCore<User>(opt=>{
+              opt.Password.RequireDigit=false;
+              opt.Password.RequiredLength=4;
+              opt.Password.RequireNonAlphanumeric=false;
+              opt.Password.RequireUppercase=false;
             });
-            services.AddCors();
-            services.AddSignalR();
-            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
-            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
-            services.AddAutoMapper();
-            services.AddTransient<TrialData>();
-            services.AddScoped<IAuthRepository,AuthRepositry>();
-            services.AddScoped<IZwajRepositry,ZwajRepository>();
-            services.AddScoped<LogUserActivity>();
+            builder=new IdentityBuilder(builder.UserType,typeof(Role),builder.Services);
+            builder.AddEntityFrameworkStores<Datacontext>();
+            builder.AddRoleManager<RoleManager<Role>>();
+            builder.AddSignInManager<SignInManager<User>>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(Options=>{
                 Options.TokenValidationParameters=new TokenValidationParameters{
@@ -53,6 +53,32 @@ namespace ZwajApp.api
                     ValidateAudience=false
                 };
             }); 
+            services.AddAuthorization(
+                    options=>{
+                        options.AddPolicy("RequireAdminRole",policy=>policy.RequireRole("Admin"));
+                        options.AddPolicy("ModeratorPhotoRole",policy=>policy.RequireRole("Admin","Moderator"));
+                        options.AddPolicy("Viponly",policy=>policy.RequireRole("VIP"));
+                    }
+            );
+            services.AddMvc(options=>{
+                var policy=new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(option=>{
+                option.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                //for preiform json optject in data come
+            });
+            services.AddCors();
+            services.AddSignalR();
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
+            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
+             services.AddAutoMapper();
+            // Mapper.Reset();
+            services.AddTransient<TrialData>();
+            services.AddScoped<IZwajRepositry,ZwajRepository>();
+            services.AddScoped<LogUserActivity>();
+            
             
         }
 
@@ -83,7 +109,7 @@ namespace ZwajApp.api
             }
 
             // app.UseHttpsRedirection();
-            // trialData.TrialUsers();//=>use this to generate data in triale date in database
+             // trialData.TrialUsers();//=>use this to generate data in triale date in database
             app.UseCors(x=>x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
             app.UseSignalR(routes=>{
                 routes.MapHub<ChatHub>("/chat");

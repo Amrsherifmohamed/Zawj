@@ -15,6 +15,7 @@ export class MessagesComponent implements OnInit {
   messages: Message[];
   pagination: Pagination;
   messageType = 'Unread';
+  // tslint:disable-next-line:max-line-length
   constructor(private userService:UserService,private authService:AuthService,private route:ActivatedRoute,private alertify:AlertifyService) { }
 
   ngOnInit() {

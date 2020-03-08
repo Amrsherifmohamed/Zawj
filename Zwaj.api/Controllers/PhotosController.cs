@@ -15,7 +15,6 @@ using System.Linq;
 
 namespace Zwaj.api.Controllers
 {
-  [Authorize]
     [Route("api/users/{userId}/photos")]
     [ApiController]
     public class PhotosController : ControllerBase
@@ -54,7 +53,8 @@ namespace Zwaj.api.Controllers
         {
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
-            var userFromRepo = await _repo.GetUser(userId);
+           bool isCurrentuser= (int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))==userId;
+            var userFromRepo = await _repo.GetUser(userId,isCurrentuser);
             var file = photoForCreateDto.File;
             var uploadResult = new ImageUploadResult();
             if (file != null && file.Length > 0)
@@ -90,7 +90,8 @@ namespace Zwaj.api.Controllers
         public async Task<IActionResult> SetMainPhoto(int userId,int id){
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
-            var userFromRepo=await _repo.GetUser(userId);
+            bool isCurrentuser= (int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))==userId;
+            var userFromRepo=await _repo.GetUser(userId,isCurrentuser);
             if(!userFromRepo.Photos.Any(p=>p.Id==id))
                 return Unauthorized();
             var DesiredMainPhoto=await _repo.GetPhoto(id);
@@ -108,7 +109,7 @@ namespace Zwaj.api.Controllers
         public async Task<IActionResult> Deletephoto(int userId,int id){
              if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
-            var userFromRepo=await _repo.GetUser(userId);
+            var userFromRepo=await _repo.GetUser(userId,true);
             if(!userFromRepo.Photos.Any(p=>p.Id==id))
                 return Unauthorized();
             var Photo=await _repo.GetPhoto(id);

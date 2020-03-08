@@ -64,9 +64,12 @@ namespace Zwaj.api.Data
            }
            return await PagedList<User>.CreateAsync(users,userParams.PageNumber,userParams.PageSize);
         }
-        public async Task<User> GetUser(int id)
+        public async Task<User> GetUser(int id,bool isCurrentuser)
         {
-              var user= await _context.Users.Include(u=>u.Photos).FirstOrDefaultAsync(u=>u.Id==id);
+            var query=_context.Users.Include(u=>u.Photos).AsQueryable();
+            if(isCurrentuser)
+                    query=query.IgnoreQueryFilters();
+              var user= await query.FirstOrDefaultAsync(u=>u.Id==id);
                 return user;
         }
 

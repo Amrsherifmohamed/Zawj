@@ -1,0 +1,16 @@
+
+<div class="container mt-3">
+  <h3 class="Font-Kufi">لوحة الإدارة</h3>
+  <div class="tab-panel">
+    <tabset class="member-tabset">
+      <tab heading="إدارة المستخدمين" *hasRole="['Admin']">
+        <div class="container">
+            <app-user-managment></app-user-managment>
+        </div>
+      </tab>
+      <tab heading="إدارة الصور" *hasRole="['Admin','Moderator']">
+        <app-photo-managment></app-photo-managment>
+      </tab>
+    </tabset>
+  </div>
+</div>

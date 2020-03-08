@@ -14,9 +14,7 @@ namespace Zwaj.api.Data
         }
        public async Task<User> Register(User user,string password){
             byte[] passwordhash,passwordsolt;
-            createpasswordhash(password,out passwordhash,out passwordsolt); 
-            user.Passwordhash=passwordhash;
-            user.PasswordsSalt=passwordsolt;   
+            createpasswordhash(password,out passwordhash,out passwordsolt);  
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             return user; 
@@ -29,10 +27,8 @@ namespace Zwaj.api.Data
             }
         }
         public async Task<User> Login(string username,string password){
-            var user=await _context.Users.Include(p=>p.Photos).FirstOrDefaultAsync(x=>x.Username==username);
+            var user=await _context.Users.Include(p=>p.Photos).FirstOrDefaultAsync(x=>x.UserName==username);
             if(user==null) return null;
-            if(!VerifyPasswordHash(password,user.PasswordsSalt,user.Passwordhash))
-            return null;
             return user;
         }
         private bool VerifyPasswordHash(string password,byte[] passwordsolt,byte[] passwordhash){
@@ -48,7 +44,7 @@ namespace Zwaj.api.Data
             }
         }
         public async Task<bool> UserExits(string username){
-            if(await _context.Users.AnyAsync(x=>x.Username==username)) return true;
+            if(await _context.Users.AnyAsync(x=>x.UserName==username)) return true;
             return false;  
         }
     }

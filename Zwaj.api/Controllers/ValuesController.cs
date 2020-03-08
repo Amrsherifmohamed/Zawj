@@ -7,9 +7,9 @@ using Zwaj.api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 
-namespace ZwajApp.api.Controllers
+namespace Zwaj.api.Controllers
 {
-    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
@@ -21,7 +21,7 @@ namespace ZwajApp.api.Controllers
             
         }
         // GET api/values
-        [AllowAnonymous]
+        [Authorize(Roles="Admin")]
         [HttpGet]
         public async Task<IActionResult> Getvalues()
         {
@@ -30,7 +30,7 @@ namespace ZwajApp.api.Controllers
         }
 
         // GET api/values/5
-        [AllowAnonymous]
+        [Authorize(Roles="Member")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Getvalue(int id)
         {
