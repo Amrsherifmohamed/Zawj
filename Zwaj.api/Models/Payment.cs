@@ -1,9 +1,10 @@
 using System;
-namespace Zwaj.api.Models
+
+namespace ZwajApp.API.Models
 {
     public class Payment
     {
-         public int Id { get; set; } 
+        public int Id { get; set; } 
         public DateTime PaymentDate {get; set;}
         public double Amount { get; set; } 
         public int UserId { get; set; } 

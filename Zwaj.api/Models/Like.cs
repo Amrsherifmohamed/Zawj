@@ -1,4 +1,4 @@
-namespace Zwaj.api.Models
+namespace ZwajApp.API.Models
 {
     public class Like
     {

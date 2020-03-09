@@ -13,6 +13,8 @@ import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
 export class AuthService {
   jwtHelper = new JwtHelperService();
   baseUrl = environment.apiUrl+'auth/';
+  siteLang:string='ar';
+  dir:string = 'rtl';
   decodedToken:any;
   currentUser:User;
   paid:boolean=false;
@@ -22,9 +24,23 @@ export class AuthService {
   unreadCount = new BehaviorSubject<string>('');
   latestUnreadCount = this.unreadCount.asObservable();
   
+  language = new BehaviorSubject<string>('ar');
+  lang = this.language.asObservable();
   hubConnection:HubConnection = new HubConnectionBuilder().withUrl("http://localhost:5000/chat").build();
   
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.lang.subscribe(
+      lang=>{
+        if(lang == 'en'){
+          this.dir = 'ltr';
+          this.siteLang = 'en';
+        }else{
+          this.dir = 'rtl';
+          this.siteLang = 'ar';
+        }
+      }
+    );
+   }
 changeMemberPhoto(newPhotoUrl:string){
   this.photoUrl.next(newPhotoUrl);
 }
@@ -54,17 +70,17 @@ changeMemberPhoto(newPhotoUrl:string){
     catch{
       return false
     }
-  }
-  rolematch(AllowedRoles:Array<string>):boolean{
-    let isMatch=false;
-    const userRoles=this.decodedToken.role as Array<string>;
-    AllowedRoles.forEach(element=>{
-      if(userRoles.includes(element)){      isMatch=true;
-      return;
+     }
+
+  roleMatch(AllowedRoles:Array<string>) : boolean{
+    let isMatch = false;
+    const userRoles = this.decodedToken.role as Array<string>;
+    AllowedRoles.forEach(element =>{
+      if(userRoles.includes(element)){
+        isMatch = true;
+        return;
       }
     });
     return isMatch;
   }
-
-
 }

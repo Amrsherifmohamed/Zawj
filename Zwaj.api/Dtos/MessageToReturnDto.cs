@@ -1,6 +1,7 @@
 using System;
+using ZwajApp.API.Models;
 
-namespace Zwaj.api.Dtos
+namespace ZwajApp.API.Dtos
 {
     public class MessageToReturnDto
     {
@@ -13,7 +14,8 @@ namespace Zwaj.api.Dtos
         public string RecipientPhotoUrl { get; set; }
         public string Content { get; set; }
         public bool IsRead { get; set; }
-        public DateTime? DataRead { get; set; }
+        public DateTime? DateRead { get; set; }
         public DateTime MessageSent { get; set; }
+
     }
 }

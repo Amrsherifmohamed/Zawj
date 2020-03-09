@@ -1,9 +1,11 @@
+
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Zwaj.api.Models;
-using Microsoft.AspNetCore.Identity;
 using System.Linq;
-namespace Zwaj.api.Data
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
+using ZwajApp.API.Models;
+
+namespace ZwajApp.API.Data
 {
     public class TrialData
     {

@@ -1,4 +1,4 @@
-namespace Zwaj.api.Dtos
+namespace ZwajApp.API.Dtos
 {
     public class RoleEditDto
     {

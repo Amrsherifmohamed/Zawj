@@ -28,7 +28,7 @@ export class PaymentComponent implements OnInit,OnDestroy,AfterViewInit {
   successPaid:boolean=false;
   loader:boolean=false;
 
-  constructor(private cd: ChangeDetectorRef, private userService:UserService,private authService:AuthService , private location:Location,private route:ActivatedRoute) {}
+  constructor(private cd: ChangeDetectorRef, private userService:UserService,public authService:AuthService , private location:Location,private route:ActivatedRoute) {}
 
   ngAfterViewInit() {
     
@@ -45,9 +45,12 @@ export class PaymentComponent implements OnInit,OnDestroy,AfterViewInit {
   
     this.card = elements.create('card', {hidePostalCode: true ,style: style });
     this.card.mount(this.cardInfo.nativeElement);
-    // this.card.mount('#card-info');  
+    // this.card.mount('#card-info');
+      
     this.card.addEventListener('change', this.cardHandler);
+   
   }
+
   ngOnDestroy() {
     this.card.removeEventListener('change', this.cardHandler);
     this.card.destroy();
@@ -62,7 +65,8 @@ export class PaymentComponent implements OnInit,OnDestroy,AfterViewInit {
       this.error="تاريخ إنتهاء البطاقة غير صحيح"
       if(error.message==="Your card's security code is incomplete.")
       this.error="كود الحماية غير صحيح"
-
+     
+     
     } else {
       this.error = null;
     }

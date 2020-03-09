@@ -12,7 +12,7 @@ import { error } from '@angular/compiler/src/util';
 })
 export class MemberCardComponent implements OnInit {
 @Input() user:User
-  constructor(private authService:AuthService,private userService : UserService,private alertify:AlertifyService) { }
+  constructor(public authService:AuthService,private userService : UserService,private alertify:AlertifyService) { }
 
   ngOnInit() {
   }

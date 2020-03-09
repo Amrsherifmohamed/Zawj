@@ -2,39 +2,41 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Zwaj.api.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ZwajApp.API.Data;
 
-namespace Zwaj.api.Controllers
+namespace ZwajApp.API.Controllers
 {
-
+    
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        private readonly Datacontext _context;
-        public ValuesController(Datacontext context)
+        private readonly DataContext _context;
+        public ValuesController(DataContext context)
         {
             _context = context;
-            
+
         }
+        // Get http://localhost:5000/api/values
         // GET api/values
         [Authorize(Roles="Admin")]
         [HttpGet]
-        public async Task<IActionResult> Getvalues()
+        public async Task<IActionResult> GetValues()
         {
-            var values=await _context.Values.ToListAsync();
+
+            var values = await  _context.Values.ToListAsync();
             return Ok(values);
         }
 
         // GET api/values/5
         [Authorize(Roles="Member")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> Getvalue(int id)
+        public async Task<IActionResult> GetValue(int id)
         {
-            var value= await _context.Values.FirstOrDefaultAsync(x=>x.id==id);
+            var value = await _context.Values.FirstOrDefaultAsync(x=>x.id==id);
             return Ok(value);
         }
 

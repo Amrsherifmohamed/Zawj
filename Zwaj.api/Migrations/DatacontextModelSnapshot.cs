@@ -3,18 +3,18 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Zwaj.api.Data;
+using ZwajApp.API.Data;
 
-namespace ZwajApp.api.Migrations
+namespace ZwajApp.API.Migrations
 {
-    [DbContext(typeof(Datacontext))]
-    partial class DatacontextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DataContext))]
+    partial class DataContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.0-preview3-35497");
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
@@ -84,7 +84,7 @@ namespace ZwajApp.api.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Like", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Like", b =>
                 {
                     b.Property<int>("LikerId");
 
@@ -97,14 +97,14 @@ namespace ZwajApp.api.Migrations
                     b.ToTable("Likes");
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Message", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Content");
 
-                    b.Property<DateTime?>("DataRead");
+                    b.Property<DateTime?>("DateRead");
 
                     b.Property<bool>("IsRead");
 
@@ -114,7 +114,7 @@ namespace ZwajApp.api.Migrations
 
                     b.Property<int>("RecipientId");
 
-                    b.Property<bool>("SenderDelated");
+                    b.Property<bool>("SenderDeleted");
 
                     b.Property<int>("SenderId");
 
@@ -127,7 +127,7 @@ namespace ZwajApp.api.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Payment", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Payment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -151,7 +151,7 @@ namespace ZwajApp.api.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Photo", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Photo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -160,7 +160,9 @@ namespace ZwajApp.api.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<bool>("Ismain");
+                    b.Property<bool>("IsApproved");
+
+                    b.Property<bool>("IsMain");
 
                     b.Property<string>("PublicId");
 
@@ -175,7 +177,7 @@ namespace ZwajApp.api.Migrations
                     b.ToTable("Photos");
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Role", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -198,7 +200,7 @@ namespace ZwajApp.api.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.User", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -212,7 +214,9 @@ namespace ZwajApp.api.Migrations
 
                     b.Property<string>("Country");
 
-                    b.Property<DateTime>("DateofBirth");
+                    b.Property<DateTime>("Created");
+
+                    b.Property<DateTime>("DateOfBirth");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256);
@@ -223,7 +227,11 @@ namespace ZwajApp.api.Migrations
 
                     b.Property<string>("Interests");
 
+                    b.Property<string>("Introduction");
+
                     b.Property<string>("KnownAs");
+
+                    b.Property<DateTime>("LastActive");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -250,12 +258,6 @@ namespace ZwajApp.api.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
-                    b.Property<DateTime>("created");
-
-                    b.Property<string>("introduction");
-
-                    b.Property<DateTime>("lastActive");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -268,7 +270,7 @@ namespace ZwajApp.api.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.UserRole", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.UserRole", b =>
                 {
                     b.Property<int>("UserId");
 
@@ -281,12 +283,12 @@ namespace ZwajApp.api.Migrations
                     b.ToTable("AspNetUserRoles");
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Value", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Value", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("name");
+                    b.Property<string>("Name");
 
                     b.HasKey("id");
 
@@ -295,7 +297,7 @@ namespace ZwajApp.api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("Zwaj.api.Models.Role")
+                    b.HasOne("ZwajApp.API.Models.Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -303,7 +305,7 @@ namespace ZwajApp.api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("Zwaj.api.Models.User")
+                    b.HasOne("ZwajApp.API.Models.User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -311,7 +313,7 @@ namespace ZwajApp.api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("Zwaj.api.Models.User")
+                    b.HasOne("ZwajApp.API.Models.User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -319,59 +321,54 @@ namespace ZwajApp.api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("Zwaj.api.Models.User")
+                    b.HasOne("ZwajApp.API.Models.User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Like", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Like", b =>
                 {
-                    b.HasOne("Zwaj.api.Models.User", "Likee")
+                    b.HasOne("ZwajApp.API.Models.User", "Likee")
                         .WithMany("Likers")
                         .HasForeignKey("LikeeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Zwaj.api.Models.User", "Liker")
+                    b.HasOne("ZwajApp.API.Models.User", "Liker")
                         .WithMany("Likees")
                         .HasForeignKey("LikerId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Message", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Message", b =>
                 {
-                    b.HasOne("Zwaj.api.Models.User", "Recipient")
-                        .WithMany("MassageRecived")
+                    b.HasOne("ZwajApp.API.Models.User", "Recipient")
+                        .WithMany("MessagesReceived")
                         .HasForeignKey("RecipientId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Zwaj.api.Models.User", "Sender")
-                        .WithMany("MassageSent")
+                    b.HasOne("ZwajApp.API.Models.User", "Sender")
+                        .WithMany("MessagesSent")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.Photo", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.Photo", b =>
                 {
-                    b.HasOne("Zwaj.api.Models.User", "User")
+                    b.HasOne("ZwajApp.API.Models.User", "User")
                         .WithMany("Photos")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Zwaj.api.Models.UserRole", b =>
+            modelBuilder.Entity("ZwajApp.API.Models.UserRole", b =>
                 {
-                    b.HasOne("Zwaj.api.Models.Role")
-                        .WithMany()
+                    b.HasOne("ZwajApp.API.Models.Role", "Role")
+                        .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Zwaj.api.Models.Role", "Role")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Zwaj.api.Models.User", "User")
+                    b.HasOne("ZwajApp.API.Models.User", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

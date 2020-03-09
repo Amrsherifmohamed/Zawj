@@ -1,13 +1,14 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Zwaj.api.Models;
+using ZwajApp.API.Data;
+using ZwajApp.API.Models;
 
 namespace Zwaj.api.Data
 {
     public class AuthRepositry : IAuthRepository
     {
-        private readonly Datacontext _context;
-        public AuthRepositry(Datacontext context)
+        private readonly DataContext _context;
+        public AuthRepositry(DataContext context)
         {
             _context = context;
             
@@ -46,6 +47,11 @@ namespace Zwaj.api.Data
         public async Task<bool> UserExits(string username){
             if(await _context.Users.AnyAsync(x=>x.UserName==username)) return true;
             return false;  
+        }
+
+        public Task<bool> UserExists(string username)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

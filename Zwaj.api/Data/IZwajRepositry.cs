@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Zwaj.api.Models;
-using Zwaj.api.Dtos;
-using Zwaj.api.helper;
+using ZwajApp.API.Helpers;
+using ZwajApp.API.Models;
 
 namespace Zwaj.api.Data
 {

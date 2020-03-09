@@ -35,12 +35,14 @@ import { ListResolver } from './_resolvers/lists.resolver';
 import { MessageResolver } from './_resolvers/message.resolver';
 import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
 import { PaymentComponent } from './payment/payment.component';
-import { AdminPanelComponent } from './Admin/admin-panel/admin-panel.component';
-import { HasroleDirective } from './_directive/hasrole.directive';
-import { UserManagmentComponent } from './Admin/user-managment/user-managment.component';
-import { PhotoManagmentComponent } from './Admin/photo-managment/photo-managment.component';
+import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
+import { HasRoleDirective } from './_directives/has-role.directive';
+import { UserManagementComponent } from './admin/user-management/user-management.component';
+import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
 import { AdminService } from './_services/admin.service';
-import { RolesModelComponent } from './Admin/roles-model/roles-model.component';
+import { RolesModalComponent } from './admin/roles-modal/roles-modal.component';
+import { LangDirective } from './_directives/lang.directive';
+import { AllMembersReportComponent } from './_reports/all-members-report/all-members-report.component';
 
 
 export function tokenGetter() {
@@ -64,10 +66,12 @@ export function tokenGetter() {
       MemberMessagesComponent,
       PaymentComponent,
       AdminPanelComponent,
-      HasroleDirective,
-      UserManagmentComponent,
-      PhotoManagmentComponent,
-      RolesModelComponent
+      HasRoleDirective,
+      UserManagementComponent,
+      PhotoManagementComponent,
+      RolesModalComponent,
+      LangDirective,
+      AllMembersReportComponent
       
    ],
    imports: [
@@ -81,6 +85,7 @@ export function tokenGetter() {
       BsDropdownModule.forRoot(),
       BsDatepickerModule.forRoot(),
       ButtonsModule.forRoot(),
+      ModalModule.forRoot(),
       
       RouterModule.forRoot(appRoutes),
       TabsModule.forRoot(),
@@ -90,8 +95,7 @@ export function tokenGetter() {
            whitelistedDomains: ['localhost:5000'],
            blacklistedRoutes: ['localhost:5000/api/auth']
          }
-       }),
-       ModalModule.forRoot()
+       })
       
    ],
    providers: [
@@ -108,7 +112,7 @@ export function tokenGetter() {
       MessageResolver,
       AdminService
    ],
-   entryComponents:[RolesModelComponent],
+   entryComponents:[RolesModalComponent],
    bootstrap: [
       AppComponent
    ]

@@ -11,9 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Zwaj.api.Models;
-using Zwaj.api.Dtos;
-namespace Zwaj.api.Controllers
+using ZwajApp.API.Data;
+using ZwajApp.API.Dtos;
+using ZwajApp.API.Models;
+
+namespace ZwajApp.API.Controllers
 {
     [AllowAnonymous]
     [Route("api/[controller]")]
@@ -33,9 +35,11 @@ namespace Zwaj.api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserForRegiterDto userForRegisterDto)
+        public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
+
             var userToCreate = _mapper.Map<User>(userForRegisterDto);
+
             var result = await _userManager.CreateAsync(userToCreate,userForRegisterDto.Password);
             var userToReturn = _mapper.Map<UserForDetailsDto>(userToCreate);
             if(result.Succeeded){
@@ -48,11 +52,11 @@ namespace Zwaj.api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
-            var user = await _userManager.FindByNameAsync(userForLoginDto.username);
-            var result = await _signInManager.CheckPasswordSignInAsync(user,userForLoginDto.password,false);
+            var user = await _userManager.FindByNameAsync(userForLoginDto.UserName);
+            var result = await _signInManager.CheckPasswordSignInAsync(user,userForLoginDto.Password,false);
             if(result.Succeeded){
                 var appUser = await _userManager.Users.Include(p=>p.Photos).FirstOrDefaultAsync(
-                    u=>u.NormalizedUserName==userForLoginDto.username.ToUpper()
+                    u=>u.NormalizedUserName==userForLoginDto.UserName.ToUpper()
                 );
                 var userToReturn = _mapper.Map<UserForListDto>(appUser);
                 return Ok(new

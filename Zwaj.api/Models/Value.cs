@@ -1,10 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-namespace Zwaj.api.Models
+namespace ZwajApp.API.Models
 {
     public class Value
     {
-        
-        public int id { get; set; }
-        public string name { get; set; }
+        public int id { get; set; } 
+        public string Name { get; set; }
     }
 }

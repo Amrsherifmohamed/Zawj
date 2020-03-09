@@ -7,14 +7,15 @@ import { User } from '../_models/user';
   providedIn: 'root'
 })
 export class AdminService {
-baseUrl=environment.apiUrl+'admin/';
-  constructor(private http:HttpClient) { }
-  getuserwithroles(){
-    return this.http.get(this.baseUrl+"userWithRoles")
+  baseUrl = environment.apiUrl + 'admin/';
+  constructor(private http: HttpClient) { }
+  getUsersWithRoles(){
+    return this.http.get(this.baseUrl+'usersWithRoles');
   }
   updateUserRoles(user:User,roles:{}){
-    return this.http.post(this.baseUrl+"editroles/"+user.username,roles);
+    return this.http.post(this.baseUrl+'editRoles/'+user.userName,roles);
   }
+
   getPhotosForApproval() {
     return this.http.get(this.baseUrl + 'photosForModeration');
   }

@@ -1,42 +1,40 @@
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
-using Zwaj.api.Data;
-using Zwaj.api.Dtos;
-using Zwaj.api.Models;
-using Zwaj.api.helper;
 using AutoMapper;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using CloudinaryDotNet.Core;
-using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using ZwajApp.API.Data;
+using ZwajApp.API.Dtos;
+using ZwajApp.API.Helpers;
+using ZwajApp.API.Models;
 
-namespace Zwaj.api.Controllers
+namespace ZwajApp.API.Controllers
 {
     [Route("api/users/{userId}/photos")]
     [ApiController]
     public class PhotosController : ControllerBase
     {
-        private readonly IZwajRepositry _repo;
+        private readonly IZwajRepository _repo;
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private readonly IMapper _mapper;
         private Cloudinary _cloudinary;
 
-        public PhotosController(IZwajRepositry repo, IOptions<CloudinarySettings> cloudinaryConfig,
+        public PhotosController(IZwajRepository repo, IOptions<CloudinarySettings> cloudinaryConfig,
         IMapper mapper)
         {
             _mapper = mapper;
             _cloudinaryConfig = cloudinaryConfig;
             _repo = repo;
-            Account account  = new Account(
-               _cloudinaryConfig.Value.Cloudname,
+            Account acc = new Account(
+               _cloudinaryConfig.Value.CloudName,
                 _cloudinaryConfig.Value.ApiKey,
                 _cloudinaryConfig.Value.ApiSecret
             );
-              
-               _cloudinary = new Cloudinary(account);
+            _cloudinary = new Cloudinary(acc);
 
         }
 
@@ -49,12 +47,11 @@ namespace Zwaj.api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddPhotoForUser(int userId,[FromForm]PhotoForCreateDto photoForCreateDto)
+        public async Task<IActionResult> AddPhotoForUser(int userId, [FromForm]PhotoForCreateDto photoForCreateDto)
         {
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
-           bool isCurrentuser= (int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))==userId;
-            var userFromRepo = await _repo.GetUser(userId,isCurrentuser);
+            var userFromRepo = await _repo.GetUser(userId,true);
             var file = photoForCreateDto.File;
             var uploadResult = new ImageUploadResult();
             if (file != null && file.Length > 0)
@@ -74,8 +71,8 @@ namespace Zwaj.api.Controllers
             photoForCreateDto.Url = uploadResult.Uri.ToString();
             photoForCreateDto.publicId = uploadResult.PublicId;
             var photo = _mapper.Map<Photo>(photoForCreateDto);
-            if (!userFromRepo.Photos.Any(p => p.Ismain))
-                photo.Ismain = true;
+            if (!userFromRepo.Photos.Any(p => p.IsMain))
+                photo.IsMain = true;
             userFromRepo.Photos.Add(photo);
             if (await _repo.SaveAll())
             {
@@ -86,50 +83,53 @@ namespace Zwaj.api.Controllers
             return BadRequest("خطأ في إضافة الصورة");
 
         }
-        [HttpPost("{id}/setMain")]
-        public async Task<IActionResult> SetMainPhoto(int userId,int id){
-            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                return Unauthorized();
-            bool isCurrentuser= (int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))==userId;
-            var userFromRepo=await _repo.GetUser(userId,isCurrentuser);
-            if(!userFromRepo.Photos.Any(p=>p.Id==id))
-                return Unauthorized();
-            var DesiredMainPhoto=await _repo.GetPhoto(id);
-            if(DesiredMainPhoto.Ismain)
-                return BadRequest("هذه الصوره الاساسيه بالفعل");
-            var CurrentMainPhoto =await _repo.GetmainPhotoForUser(userId);
-            CurrentMainPhoto.Ismain=false;
-            DesiredMainPhoto.Ismain=true;
-            if(await _repo.SaveAll())
-            return NoContent();
-            return BadRequest("لا يمكن تعديل الصوره");
 
-        }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Deletephoto(int userId,int id){
+        [HttpPost("{id}/setMain")]
+        public async Task<IActionResult> SetMainPhoto(int userId,int id)
+        {
              if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
-            var userFromRepo=await _repo.GetUser(userId,true);
+            var userFromRepo = await _repo.GetUser(userId,true);
             if(!userFromRepo.Photos.Any(p=>p.Id==id))
+            return Unauthorized();
+            var DesiredMainPhoto = await _repo.GetPhoto(id);
+            if(DesiredMainPhoto.IsMain)
+            return BadRequest("هذه هي الصورة الأساسية بالفعل");
+            var CurrentMainPhoto = await _repo.GetMainPhotoForUser(userId);
+            CurrentMainPhoto.IsMain=false;
+            DesiredMainPhoto.IsMain=true;
+            if(await _repo.SaveAll())
+            return NoContent();
+            return BadRequest("لايمكن تعديل الصورة الأساسية");
+            
+        }
+
+         [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePhoto(int userId,int id){
+        if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
-            var Photo=await _repo.GetPhoto(id);
-            if(Photo.Ismain)
-                return BadRequest("هذه الصوره الاساسيه بالفعل");
+            var userFromRepo = await _repo.GetUser(userId,true);
+            if(!userFromRepo.Photos.Any(p=>p.Id==id))
+            return Unauthorized();
+            var Photo = await _repo.GetPhoto(id);
+            if(Photo.IsMain)
+            return BadRequest("لايمكن حذف الصورة الأساسية");
             if(Photo.PublicId!=null){
-                var deleteparems=new DeletionParams(Photo.PublicId);    
-                var result=this._cloudinary.Destroy(deleteparems);
-                if(result.Result=="OK"){
+                var deleteParams = new DeletionParams(Photo.PublicId);
+                var result = this._cloudinary.Destroy(deleteParams);
+                if(result.Result=="ok"){
                     _repo.Delete(Photo);
                 }
             }
             if(Photo.PublicId==null){
-                this._repo.Delete(Photo);
+                  _repo.Delete(Photo);
             }
-            if(await _repo.SaveAll())
-                return Ok();
-                return BadRequest("لم يتم مسح الصوره");
-            
-        }
 
-    }   
+            if(await _repo.SaveAll())
+            return Ok();
+            return BadRequest("فشل حذف الصورة");
+            
+    }
+    }
+   
 }

@@ -1,79 +1,85 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Zwaj.api.Data;
-using Zwaj.api.Dtos;
-using Zwaj.api.helper;
-using Zwaj.api.Models;
+using ZwajApp.API.Data;
+using ZwajApp.API.Dtos;
+using ZwajApp.API.Helpers;
+using ZwajApp.API.Models;
 
-namespace Zwaj.api.Controllers
+namespace ZwajApp.API.Controllers
 {
     [ServiceFilter(typeof(LogUserActivity))]
-    [Route("api/users/{userId}/[controller]")]//route for this controller api/Users
+    [Route("api/users/{userId}/[controller]")]
     [ApiController]
-    public class MessagesController :ControllerBase
+    public class MessagesController : ControllerBase
     {
-         private readonly IZwajRepositry _repo;
+        private readonly IZwajRepository _repo;
         private readonly IMapper _mapper;
-        public MessagesController(IZwajRepositry repo,IMapper mapper)
+        public MessagesController(IZwajRepository repo, IMapper mapper)
         {
-            _repo=repo;  
-            _mapper=mapper; 
+            _mapper = mapper;
+            _repo = repo;
+
         }
+
         [HttpGet("{id}",Name="GetMessage")]
-        public async Task<IActionResult> GetMeassage(int userId,int id){
-            if(userId!= int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-            return Unauthorized();
-            var messageFromrepo=await _repo.GetMessage(id);
-            if(messageFromrepo==null){
-                return NotFound();
-            }
-            return Ok(messageFromrepo);
+        public async Task<IActionResult> GetMessage(int userId,int id){
+            if(userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+             return Unauthorized();
+             var messageFromRepo = await _repo.GetMessage(id);
+             if(messageFromRepo==null)
+             return NotFound();
+             return Ok(messageFromRepo);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetMessagesForUser(int userId,[FromQuery]MessageParams messageParams )
         {
             if(userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
              return Unauthorized();
              messageParams.UserId=userId;
-             var MessagesFromRepo = await _repo.GetMessageForUser(messageParams);
+             var MessagesFromRepo = await _repo.GetMessagesForUser(messageParams);
              var messages = _mapper.Map<IEnumerable<MessageToReturnDto>>(MessagesFromRepo);
              Response.AddPagination(MessagesFromRepo.CurrentPage,MessagesFromRepo.PageSize,MessagesFromRepo.TotalCount,MessagesFromRepo.TotalPages);
              return Ok(messages);
         }
+
         [HttpPost]
-        public async Task<IActionResult> CreateMessage(int userId,MessageForCreateDto 
-        messageForCreateDto)
+        public async Task<IActionResult> CreateMessage(int userId,MessageForCreationDto messageForCreationDto)
         {
-            var sender= _repo.GetUser(userId,true);
+            var sender = await _repo.GetUser(userId,true);
             if(sender.Id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-            return Unauthorized();
-            messageForCreateDto.SenderId=userId;
-            var RecipentFromrepo= await _repo.GetUser(messageForCreateDto.RecipientId,false);
-            if(RecipentFromrepo==null)
-            return BadRequest("لم يتم الوصول للمرسال اليه");
-            var message=_mapper.Map<Message>(messageForCreateDto);
-            _repo.Add(message);
-            if(await _repo.SaveAll()){
-            var messagetoreturn=_mapper.Map<MessageToReturnDto>(message);
-            return CreatedAtRoute("GetMessage",new {Id=message.Id},messagetoreturn);
-            //id= id for message in new route from database
-            }
-            throw new Exception("حدثت مشكله فى حفظ الرساله ");
+             return Unauthorized();
+             messageForCreationDto.SenderId= userId;
+             var recipient = await _repo.GetUser(messageForCreationDto.RecipientId,false);
+             if(recipient==null)
+             return BadRequest("لم يتم الوصول للمرسل إليه");
+             var message = _mapper.Map<Message>(messageForCreationDto); 
+             _repo.Add(message);
+             
+             if(await _repo.SaveAll()){
+                var messageToReturn = _mapper.Map<MessageToReturnDto>(message);
+                return CreatedAtRoute("GetMessage",new {id=message.Id},messageToReturn);
+             }
+             
+             throw new Exception("حدثت مشكلة أثناء حفظ الرسالة الجديدة");
         }
+
         [HttpGet("chat/{recipientId}")]
         public async Task<IActionResult> GetConversation(int userId , int recipientId)
         {
             if(userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
              return Unauthorized();
-             var messagesFromRepo = await _repo.GetConversition(userId,recipientId);
+             var messagesFromRepo = await _repo.GetConversation(userId,recipientId);
              var messageToReturn = _mapper.Map<IEnumerable<MessageToReturnDto>>(messagesFromRepo);
              return Ok(messageToReturn);
         }
+
         [HttpGet("count")]
         public async Task<IActionResult> GetUnreadMessagesForUser(int userId){
             if(userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
@@ -81,6 +87,7 @@ namespace Zwaj.api.Controllers
             var count = await _repo.GetUnreadMessagesForUser( int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value));
             return Ok(count);
         }
+
         [HttpPost("read/{id}")]
         public async Task<IActionResult> MarkMessageAsRead(int userId,int id){
             if(userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
@@ -89,25 +96,25 @@ namespace Zwaj.api.Controllers
              if(message.RecipientId != userId)
                  return Unauthorized();
             message.IsRead = true;
-            message.DataRead=DateTime.Now;
+            message.DateRead=DateTime.Now;
             await _repo.SaveAll();
             return NoContent();
-       }	
-       [HttpPost("{id}")]
-       public async Task<IActionResult> DeleteMessage(int id,int userId){
-         if(userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-             return Unauthorized();
-         var message = await _repo.GetMessage(id);
-         if(message.SenderId==userId)
-        message.SenderDelated=true;
-        if(message.RecipientId==userId)
-        message.RecipientDeleted=true;
-        if(message.SenderDelated&&message.RecipientDeleted)
-        _repo.Delete(message);
-        if(await _repo.SaveAll())
-        return NoContent();
-        throw new Exception ("حدث خطا اثناؤ المسح");
        }
-        
+
+       [HttpPost("{id}")]
+       public async Task<IActionResult> DeleteMessage (int id , int userId){
+            if(userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+             return Unauthorized();
+             var message = await _repo.GetMessage(id);
+             if(message.SenderId == userId)
+             message.SenderDeleted = true;
+             if(message.RecipientId == userId)
+             message.RecipientDeleted = true;
+             if(message.SenderDeleted && message.RecipientDeleted)
+             _repo.Delete(message);
+             if(await _repo.SaveAll())
+             return NoContent();
+             throw new Exception("حدث خطأ أثناء حذف الرسالة");
+       }				   
     }
 }

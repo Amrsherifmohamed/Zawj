@@ -4,19 +4,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Zwaj.api.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Zwaj.api.helper;
 using AutoMapper;
-using Zwaj.api.Models;
 using Stripe;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using System.Net;
+using ZwajApp.API.Models;
+using ZwajApp.API.Helpers;
+using Zwaj.api.Data;
+using ZwajApp.API.Data;
+using DinkToPdf.Contracts;
+using DinkToPdf;
 
 namespace ZwajApp.api
 {
@@ -32,58 +36,66 @@ namespace ZwajApp.api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<Datacontext>(x=>x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            IdentityBuilder builder=services.AddIdentityCore<User>(opt=>{
-              opt.Password.RequireDigit=false;
-              opt.Password.RequiredLength=4;
-              opt.Password.RequireNonAlphanumeric=false;
-              opt.Password.RequireUppercase=false;
+            services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            IdentityBuilder builder = services.AddIdentityCore<User>(opt=>{
+                opt.Password.RequireDigit = false;
+                opt.Password.RequiredLength = 4;
+                opt.Password.RequireNonAlphanumeric = false;
+                opt.Password.RequireUppercase = false;
             });
-            builder=new IdentityBuilder(builder.UserType,typeof(Role),builder.Services);
-            builder.AddEntityFrameworkStores<Datacontext>();
+            builder = new IdentityBuilder(builder.UserType,typeof(Role),builder.Services);
+            builder.AddEntityFrameworkStores<DataContext>();
+            builder.AddRoleValidator<RoleValidator<Role>>();
             builder.AddRoleManager<RoleManager<Role>>();
             builder.AddSignInManager<SignInManager<User>>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(Options=>{
-                Options.TokenValidationParameters=new TokenValidationParameters{
-                    ValidateIssuerSigningKey=true,
-                    IssuerSigningKey=new SymmetricSecurityKey(Encoding.ASCII.GetBytes
-                    (Configuration.GetSection("Appsettings:Token").Value)),
-                    ValidateIssuer=false,
-                    ValidateAudience=false
+            .AddJwtBearer(Options =>
+            {
+                Options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+
                 };
-            }); 
-            services.AddAuthorization(
-                    options=>{
-                        options.AddPolicy("RequireAdminRole",policy=>policy.RequireRole("Admin"));
-                        options.AddPolicy("ModeratorPhotoRole",policy=>policy.RequireRole("Admin","Moderator"));
-                        options.AddPolicy("Viponly",policy=>policy.RequireRole("VIP"));
-                    }
-            );
-            services.AddMvc(options=>{
-                var policy=new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(option=>{
-                option.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                //for preiform json optject in data come
             });
+
+            services.AddAuthorization(
+                options=>{
+                    options.AddPolicy("RequireAdminRole",policy=>policy.RequireRole("Admin"));
+                    options.AddPolicy("ModeratePhotoRole",policy=>policy.RequireRole("Admin","Moderator"));
+                    options.AddPolicy("VipOnly",policy=>policy.RequireRole("VIP"));
+                }
+            );
+
+            services.AddMvc(options=>{
+                var policy = new AuthorizationPolicyBuilder()
+                            .RequireAuthenticatedUser()
+                            .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            .AddJsonOptions(option =>
+            {
+                option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+
+            });
+            services.AddSingleton(typeof(IConverter),new SynchronizedConverter(new PdfTools()));
             services.AddCors();
             services.AddSignalR();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
-             services.AddAutoMapper();
-            // Mapper.Reset();
+            services.AddAutoMapper();
             services.AddTransient<TrialData>();
-            services.AddScoped<IZwajRepositry,ZwajRepository>();
-            services.AddScoped<LogUserActivity>();
             
+            services.AddScoped<IZwajRepository, ZwajRepository>();
+            services.AddScoped<LogUserActivity>();
+            //Authentication MiddleWare
             
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,TrialData trialData)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, TrialData trialData)
         {
             StripeConfiguration.SetApiKey(Configuration.GetSection("Stripe:SecretKey").Value);
             if (env.IsDevelopment())
@@ -92,13 +104,13 @@ namespace ZwajApp.api
             }
             else
             {
-                app.UseExceptionHandler(BuilderExtensions=>
+                app.UseExceptionHandler(BuilderExtensions =>
                 {
-                    BuilderExtensions.Run(async context=>
+                    BuilderExtensions.Run(async context =>
                     {
-                        context.Response.StatusCode=(int)System.Net.HttpStatusCode.InternalServerError;
-                        var error=context.Features.Get<IExceptionHandlerFeature>();
-                        if(error!=null)
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                        if (error != null)
                         {
                             context.Response.AddApplicationError(error.Error.Message);
                             await context.Response.WriteAsync(error.Error.Message);
@@ -108,10 +120,11 @@ namespace ZwajApp.api
                 // app.UseHsts();
             }
 
+
             // app.UseHttpsRedirection();
-             // trialData.TrialUsers();//=>use this to generate data in triale date in database
-            app.UseCors(x=>x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
-            app.UseSignalR(routes=>{
+            // trialData.TrialUsers();
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseSignalR(routes => {
                 routes.MapHub<ChatHub>("/chat");
             });
             app.UseAuthentication();
